@@ -1,0 +1,1 @@
+# bash-clip-note
