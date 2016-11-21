@@ -1,0 +1,70 @@
+#!/bin/bash
+
+TITLE="Clip Note"
+CFG_FILE=~/.clipnoterc
+TMP_NOTE="/tmp/notes.$$"
+DIR_DATE=$(date +%d-%m-%Y)
+NOTE_DIR=
+
+[ -f "$CFG_FILE" ] && source "$CFG_FILE"
+
+function exit_note(){
+	[ -f "$TMP_NOTE" ] && rm -f "$TMP_NOTE"
+	exit $1
+}
+
+function save_config(){
+	echo "$1" > $CFG_FILE
+}
+
+function save_note(){
+	mv --backup=numbered --suffix=_ "$1" "$2"
+}
+
+function set_note_text(){
+	xclip -o | zenity --width=700 --height=400 --title  "$TITLE - Текст заметки" --text-info --editable > "$TMP_NOTE"
+}
+
+function set_note_dir(){
+	# папка, в которую будут сохранятся заметки
+	if [ "$CLIP_NOTE_DIR" ]; then
+		NOTE_DIR="$CLIP_NOTE_DIR"
+	else
+		NOTE_DIR=$(zenity --title  "$TITLE - Выберите папку для сохранения заметок" --file-selection --directory)
+		if [ "$NOTE_DIR" ]; then
+			save_config 'CLIP_NOTE_DIR='"$NOTE_DIR"''
+		else
+			notify-send -t 4000 -i icon_ALERT "$TITLE" "Заметка отменена!"
+			exit_note 1
+		fi
+	fi
+	NOTE_DIR="$NOTE_DIR/$DIR_DATE"
+	[ -d "$NOTE_DIR" ] || mkdir -p "$NOTE_DIR"
+}
+
+function set_note_name(){
+	# Название заметки
+	name=$(zenity --width=300 --title "$TITLE - Название заметки" --entry --text "Введите название заметки")
+	if [ $? -eq 0 ]; then
+		if [ "`echo $name`" = "" ]; then
+			name="Заметка $$"
+		fi
+		save_note "$TMP_NOTE" "$NOTE_DIR/$name.txt"
+		notify-send -t 4000 -i icon_OK "$TITLE - Заметка сохранена" "Сохранено в $name.txt"
+	else
+		notify-send -t 4000 -i icon_ALERT "$TITLE" "Заметка отменена!"
+		exit_note 1
+	fi
+}
+
+ 
+set_note_text
+if [ $? -eq 0 -a `cat "$TMP_NOTE"` != "" ]; then
+	set_note_dir
+	set_note_name
+else
+	notify-send -t 4000 -i icon_ALERT "$TITLE" "Заметка отменена!"
+	exit_note 1
+fi
+
+exit_note 0
