@@ -2,7 +2,7 @@
 
 TITLE="Clip Note"
 CFG_FILE=~/.clipnoterc
-TMP_NOTE="/tmp/notes.$$"
+TMP_NOTE="/tmp/clipnote.$$"
 DIR_DATE=$(date +%d-%m-%Y)
 NOTE_DIR=
 
@@ -59,11 +59,11 @@ function set_note_name(){
 
  
 set_note_text
-if [ $? -eq 0 -a `cat "$TMP_NOTE"` != "" ]; then
+if [ -f "$TMP_NOTE" ]; then
 	set_note_dir
 	set_note_name
 else
-	notify-send -t 4000 -i icon_ALERT "$TITLE" "Заметка отменена!"
+	notify-send -t 4000 -i icon_ALERT "$TITLE" "Заметка 222 отменена!"
 	exit_note 1
 fi
 
