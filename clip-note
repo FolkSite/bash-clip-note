@@ -1,13 +1,17 @@
 #!/bin/bash
 
+
 TITLE="Clip Note"
+# Файл для хранения настроек
 CFG_FILE=~/.clipnoterc
 TMP_NOTE="/tmp/clipnote.$$"
 DIR_DATE=$(date +%d-%m-%Y)
 NOTE_DIR=
 
+# Загружаем настройки, если файл существует
 [ -f "${CFG_FILE}" ] && source "${CFG_FILE}"
 
+# Функция удаляет временный файл с содержимым заметки
 function rm_temp_note(){
     [ -f "${TMP_NOTE}" ] && rm -f "${TMP_NOTE}"
 }
@@ -17,18 +21,25 @@ function exit_note(){
 	exit $1
 }
 
+# Если путь к папке введен, то функция сохраняет его в файл настроек
 function save_config(){
 	echo "$1" > ${CFG_FILE}
 }
 
+# Функция сохраняет заметку в папку назначения.
+# Если заметка с таким названием существует,
+# то будет создан бэкап (note.txt.1, note.txt.2 и т. д.)
 function save_note(){
 	mv --backup=numbered --suffix=_ "$1" "$2"
 }
 
+# Функция помещает содержимое буфера обмена в текстовое поле и выводит пользователю
 function set_note_text(){
 	xclip -o | zenity --width=700 --height=400 --title  "${TITLE} - Текст заметки" --text-info --editable > "${TMP_NOTE}"
 }
 
+# Функция устанавливает путь к папке сохранения.
+# В основном каталоге создаются подкаталоги с именем дд-мм-ГГГГ
 function set_note_dir(){
 	# папка, в которую будут сохранятся заметки
 	if [ "${CLIP_NOTE_DIR}" ]; then
@@ -46,8 +57,8 @@ function set_note_dir(){
 	[ -d "${NOTE_DIR}" ] || mkdir -p "${NOTE_DIR}"
 }
 
+# Функция устанавливает название заметки
 function set_note_name(){
-	# Название заметки
 	name=$(zenity --width=300 --title "${TITLE} - Название заметки" --entry --text "Введите название заметки")
 	if [ $? -eq 0 ]; then
 		if [ "`echo ${name}`" == "" ]; then
@@ -68,7 +79,7 @@ if [ $(cat ${TMP_NOTE} | wc -c) != '0' ]; then
     set_note_dir
 	set_note_name
 else
-	notify-send -t 4000 -i icon_ALERT "${TITLE}" "Заметка 222 отменена!"
+	notify-send -t 4000 -i icon_ALERT "${TITLE}" "Заметка отменена!"
 	exit_note 1
 fi
 
