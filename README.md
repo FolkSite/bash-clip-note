@@ -9,6 +9,9 @@
 - - -
 ### Установка
 ```bash
+# Установим зависимости
+$ sudo apt-get install zenity xclip
+# Клонируем репозиторий со скриптом
 $ git clone https://github.com/yarkovaleksei/bash-clip-note.git
 $ cd ./bash-clip-note
 $ chmod +x clip-note
@@ -28,6 +31,8 @@ $ chmod +x clip-note
 ![Клавиатура](screenshots/command.png)
 
 Вы можете это сделать любым удобным вам способом.
+
+Если вы не копировали скрипт в один из каталогов, включенных в PATH, то указывайте полный путь относительно корня системы.
 
 - - -
 ### Демонстрация
