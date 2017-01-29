@@ -8,6 +8,7 @@
 
 - - -
 ### Установка
+
 ```bash
 # Установим зависимости
 $ sudo apt-get install zenity xclip
